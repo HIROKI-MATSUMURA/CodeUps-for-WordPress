@@ -10,11 +10,8 @@
 </div>
 
 <!-- パンくず -->
-<div class="c-breadcrumb">
-  <div class="l-inner">
-    <div>HOME > CONTACT</div>
-  </div>
-</div>
+  <?php get_template_part('parts/breadcrumb') ?>
+
 
 
 <div class="l-page-contact p-page-contact">
