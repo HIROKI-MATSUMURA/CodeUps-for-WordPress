@@ -112,43 +112,28 @@ const cssSass = () => {
 
 // 画像圧縮
 const imgImagemin = () => {
-  // 画像ファイルを指定
-  return (
-    src(srcPath.img)
-      // 変更があった画像のみ処理対象に
-      .pipe(changed(destPath.img))
-      // 画像を圧縮
-      .pipe(
-        imagemin(
-          [
-            // JPEG画像の圧縮設定
-            imageminMozjpeg({
-              quality: 80, // 圧縮品質（0〜100）
-            }),
-            // PNG画像の圧縮設定
-            imageminPngquant(),
-            // SVG画像の圧縮設定
-            imageminSvgo({
-              plugins: [
-                {
-                  removeViewbox: false, // viewBox属性を削除しない
-                },
-              ],
-            }),
-          ],
-          {
-            verbose: true, // 圧縮情報を表示
-          }
-        )
+  // 変更があった画像のみ処理対象にし、複数の保存先に対応する
+  return src(srcPath.img)
+    .pipe(changed(destPath.img)) // 最初の変更検出
+    .pipe(
+      imagemin(
+        [
+          imageminMozjpeg({ quality: 80 }),
+          imageminPngquant(),
+          imageminSvgo({ plugins: [{ removeViewbox: false }] }),
+        ],
+        { verbose: true }
       )
-      .pipe(dest(destPath.img))
-      .pipe(dest(destWpPath.img))
-      .pipe(webp())//webpに変換
-      // 圧縮済みの画像ファイルを出力先に保存
-      .pipe(dest(destPath.img))
-      .pipe(dest(destWpPath.img))
-  );
+    )
+    .pipe(dest(destPath.img)) // 最初の保存先
+    .pipe(changed(destWpPath.img)) // WordPress用のパスで再び変更を検出
+    .pipe(dest(destWpPath.img)) // WordPress用の保存先
+    .pipe(webp()) // webpに変換
+    .pipe(dest(destPath.img)) // webpを保存
+    .pipe(dest(destWpPath.img)); // WordPress用のパスにwebpを保存
 };
+
+
 
 // js圧縮
 const jsBabel = () => {
